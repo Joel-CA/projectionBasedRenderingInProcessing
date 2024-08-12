@@ -26,29 +26,12 @@ float[][] matMul(float[][] M1, float[][] M2) {
     return output;
 }
 
-static float[] apply3DTranslation(float[] v, float[] v_translate) {
+float[] scalarVectMul(float[] V, float c) {
+  return new float[] {V[0]*c, V[1]*c, V[2]*c};
+}
+
+float[] apply3DTranslation(float[] v, float[] v_translate) {
   return new float[] {v[0] + v_translate[0], v[1] + v_translate[1], v[2] + v_translate[2]};
-}
-
-static float[] vectConstMul(float[] v, float c) {
-  return new float[] {v[0]*c, v[1]*c, v[2]*c};
-}
-
-static float[] vect3DotProd(float[] v1, float[] v2) {
-  return new float[] {v1[1]*v2[2] - v2[1]*v1[2], -(v1[0]*v2[2] - v2[0]*v1[2]), v1[0]*v2[1] - v2[0]*v1[1]};
-}
-
-/*Function to calculate the normal vector of a plane*/
-static float[] calculateNorm(float[][] pointsInPlane) {
-  float[] point1 = pointsInPlane[0];
-  float[] point2 = pointsInPlane[1];
-  float[] point3 = pointsInPlane[2];
-  
-  float[] neg_point1 = vectConstMul(point1, -1);
-  float[] vector1 = apply3DTranslation(point2, neg_point1);
-  float[] vector2 = apply3DTranslation(point3, neg_point1);
-  
-  return vect3DotProd(vector1, vector2);
 }
 
 float[] apply3DRotationX(float[] v, float[] centroid, float degrees) {
@@ -122,5 +105,5 @@ float[] proj2DTo3D(float[] P) {
   float Y = P[1];
   float Z = P[2];
   float fovConst = tan(FOV/2)*Z;
-  return new float[] {width*X/fovConst + width/2, height*Y/fovConst + height/2};
+  return new float[] {width*X/fovConst+(width/2), height*Y/fovConst+(height/2)};
 }

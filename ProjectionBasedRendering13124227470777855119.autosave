@@ -2,27 +2,26 @@ final float FOV_DEG = 45; //Field of view (degrees)
 final float FOV_RAD = radians(FOV_DEG); //Field of view (radians)
 final float MOVEMENT_SPEED = 0.5;
 boolean CAN_MOVE = false;
-float objectRotationAngle = 0; //Current rotation angle
 float objectRotationSpeed = 20; //Rotation speed (degrees/second)
 
 /*Mesh objects*/
 MeshBuilder.Mesh jet, cube;
 MeshBuilder.Mesh[] meshes;
 
-/*Plane objects*/
-MeshBuilder.Plane frontPlane, backPlane, topPlane, bottomPlane, leftPlane, rightPlane;
+/*Planes*/
+MeshBuilder.Plane frontPlane, backPlane, topPlane, bottomPlane, rightPlane, leftPlane;
 MeshBuilder.Plane[] FRUSTUM;
 
 /*axis-aligned unit vectors*/
-float frustumOffset = 1;
-float Z_NEAR = 1/tan(radians(FOV_DEG/2)) * frustumOffset;
-float Z_FAR = 125;
-float[] Z_MINUS = new float[] {0, 0, -1};
-float[] Z_PLUS = new float[] {0, 0, 1};
-float[] Y_MINUS = new float[] {0, -1, 0};
-float[] Y_PLUS = new float[] {0, 1, 0};
-float[] X_MINUS = new float[] {-1, 0, 0};
-float[] X_PLUS = new float[] {1, 0, 0};
+final float frustumOffset = 13;
+final float Z_NEAR = 1/tan(radians(FOV_DEG/2))*frustumOffset; //Z-value where frustum starts
+final float Z_FAR = 125; //Z-value where frustum ends
+final float[] Z_MINUS = new float[] {0, 0, -1};
+final float[] Z_PLUS = new float[] {0, 0, 1};
+final float[] Y_MINUS = new float[] {0, -1, 0};
+final float[] Y_PLUS = new float[] {0, 1, 0};
+final float[] X_MINUS = new float[] {-1, 0, 0};
+final float[] X_PLUS = new float[] {1, 0, 0};
 
 void setup() {
   //set display window dimensions
@@ -33,13 +32,13 @@ void setup() {
   textSize(24);
   textAlign(RIGHT);
 
-  //load frustum planes
+  //load frustrum planes
   frontPlane = new MeshBuilder.Plane(new float[] {0, 0, Z_NEAR}, Z_PLUS);
   backPlane = new MeshBuilder.Plane(new float[] {0, 0, Z_FAR}, Z_MINUS);
-  topPlane = new MeshBuilder.Plane(new float[] {0, -1/2, Z_NEAR}, new float[] {0, -sin(radians(FOV_DEG/2-90)), cos(radians(FOV_DEG/2))});
-  bottomPlane = new MeshBuilder.Plane(new float[] {0, 1/2, Z_NEAR}, new float[] {0, sin(radians(FOV_DEG/2-90)), cos(radians(FOV_DEG/2))});
-  leftPlane = new MeshBuilder.Plane(new float[] {-1/2, 0, Z_NEAR}, new float[] {-sin(radians(FOV_DEG/2-90)), 0, cos(radians(FOV_DEG/2))});
-  rightPlane = new MeshBuilder.Plane(new float[] {1/2, 0, Z_NEAR}, new float[] {sin(radians(FOV_DEG/2-90)), 0, cos(radians(FOV_DEG/2))});
+  topPlane = new MeshBuilder.Plane(new float[] {0, -1/2, Z_NEAR}, new float[] {0, sin(radians(FOV_DEG/2+90)), cos(radians(FOV_DEG/2))});
+  bottomPlane = new MeshBuilder.Plane(new float[] {0, 1/2, Z_NEAR}, new float[] {0, -sin(radians(FOV_DEG/2+90)), cos(radians(FOV_DEG/2))});
+  leftPlane = new MeshBuilder.Plane(new float[] {0, -1/2, Z_NEAR}, new float[] {sin(radians(FOV_DEG/2+90)), 0, cos(radians(FOV_DEG/2))});
+  rightPlane = new MeshBuilder.Plane(new float[] {0, 1/2, Z_NEAR}, new float[] {-sin(radians(FOV_DEG/2+90)), 0, cos(radians(FOV_DEG/2))});
   FRUSTUM = new MeshBuilder.Plane[] {frontPlane, backPlane, topPlane, bottomPlane, leftPlane, rightPlane};
 
   //load shapePoint(s) data
@@ -66,7 +65,7 @@ void setup() {
   jet.centroid = apply3DTranslation(jet.centroid, jetTranslation);
 
   //initialize list of meshes to be rendered
-  meshes = new MeshBuilder.Mesh[] {cube}; //cubePoints
+  meshes = new MeshBuilder.Mesh[] {jet}; //cubePoints
 }
 
 void draw() {

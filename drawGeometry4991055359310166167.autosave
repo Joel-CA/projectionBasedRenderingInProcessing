@@ -10,9 +10,9 @@ void drawGeometry(MeshBuilder.Face[] faces) {
       //List<float[]> vertices = new ArrayList<>(Arrays.asList(face.points));
 
       List<float[]> vertices = frustumClipPolygon(face.points);//new ArrayList<>(Arrays.asList(face.points));
-      //if (vertices.size() > 0) {
-      //  println("Number of vertices: " + vertices.size() + " ---------");
-      //}
+      if (vertices.size() > 0) {
+        //println("number of vertices to draw: " + vertices.size() + " -----------------------");
+      }
 
       for (int i = 0; i < vertices.size(); i++) {
         //Get the points of the line
@@ -42,12 +42,17 @@ void drawGeometry(MeshBuilder.Face[] faces) {
 }
 
 //Function to clip polygon against the viewing frustum
+
 List<float[]> frustumClipPolygon(List<float[]> polygonPoints) {
   //Clip the face against each plane in the frustum
-  List<float[]> outputList = polygonPoints;
+  List<float[]> outputList = new ArrayList(polygonPoints);
+  //println(outputList.size());
   for (MeshBuilder.Plane frustrumPlane : FRUSTUM) {
+    //println("hi");
     List<float[]> inputList = new ArrayList<>(outputList);
     outputList.clear();
+    //println(inputList.size());
+    //println("checking next frustrum plane:");
 
     for (int i = 0; i < inputList.size(); i++) {
       float[] currentVertex = inputList.get(i);
@@ -57,6 +62,7 @@ List<float[]> frustumClipPolygon(List<float[]> polygonPoints) {
       boolean currentInside = isInFrontOfPlane(currentVertex, frustrumPlane);
       boolean previousInside = isInFrontOfPlane(previousVertex, frustrumPlane);
       
+      //Used to Figure out why we have weird behavior whenever lines cross boundaries
       //println("Current Vertex: " + Arrays.toString(currentVertex));
       //println("Previous Vertex: " + Arrays.toString(previousVertex));
       //println("Current Inside: " + currentInside);
@@ -68,11 +74,11 @@ List<float[]> frustumClipPolygon(List<float[]> polygonPoints) {
         outputList.add(currentVertex); // Both inside, add current vertex
       } else if (previousInside && !currentInside) {
         outputList.add(planeIntersectPoint(previousVertex, currentVertex, frustrumPlane)); // Crossing to outside
-        //println("CLIP: " + Arrays.toString(currentVertex));
+        //println("CLIP Point:" + Arrays.toString(currentVertex));
       } else if (!previousInside && currentInside) {
         outputList.add(planeIntersectPoint(previousVertex, currentVertex, frustrumPlane)); // Crossing to inside
+        //println("CLIP Point:" + Arrays.toString(previousVertex));
         outputList.add(currentVertex); // Add current vertex as well
-        //println("CLIP: " + Arrays.toString(previousVertex));
       }
       // If both vertices are outside, do nothing (clip away the edge)
     }

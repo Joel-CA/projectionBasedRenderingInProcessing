@@ -46,11 +46,11 @@ public static class MeshBuilder {
   }
   
   public static class Plane extends Face  {
-    public float D;//plane constant: dot(normal, P_0)
+    public float D;//plane constant: dot(normal, P_0) (where P_0 is the vector of some point that lies on the plane)
     
     public Plane (float[] point, float[] normal)  {
-      super(new ArrayList<>(Arrays.asList(point)), normal); // Call the Face constructor
-      this.D = dotProd(normal, points.get(0));
+      super(Arrays.asList(point), normal); // Call the Face constructor
+      this.D = dotProd(normal, point);
     }
   }
 

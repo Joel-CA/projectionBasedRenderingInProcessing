@@ -34,7 +34,7 @@ public static class MeshBuilder {
   public static class Face {
     public float[][] points;
     public float[] normal;
-
+    
     public Face(float[][] points, float[] normal) {
       this.points = points;
       this.normal = normal;
@@ -42,6 +42,15 @@ public static class MeshBuilder {
     public Face(float[][] points) {
       this.points = points;
       this.normal = calculateNorm(points);
+    }
+  }
+  
+  public static class Plane extends Face  {
+    public float D;//plane constant: dot(normal, P_0)
+    
+    public Plane (float[][] points, float[] normal)  {
+      super(points, normal); // Call the Face constructor
+      this.D = -dotProd(normal, points[0]);
     }
   }
 

@@ -2,7 +2,7 @@ final float FOV = radians(45); //Field of view (degrees->radians)
 final float MOVEMENT_SPEED = 0.5;
 boolean CAN_MOVE = false;
 float objectRotationAngle = 0; //Current rotation angle
-float objectRotationSpeed = 25; //Rotation speed (degrees/second)
+float objectRotationSpeed = 20; //Rotation speed (degrees/second)
 
 /*Mesh objects*/
 MeshBuilder.Mesh jet, cube;
@@ -71,7 +71,7 @@ void draw() {
         // If the point has not been transformed yet, do so
         if (!uniquePoints.containsKey(pointKey)) {
           float[] transformedPoint = apply3DRotationY(point, mesh.centroid, rotationIncrement);//point;
-
+          transformedPoint = apply3DRotationX(transformedPoint, mesh.centroid, rotationIncrement/2);
           if (key == CODED && CAN_MOVE) {
             if (keyCode == UP) {
               transformedPoint = apply3DTranslation(transformedPoint, vectConstMul(Z_MINUS, MOVEMENT_SPEED));
@@ -96,6 +96,7 @@ void draw() {
         }
       }
       face.normal = apply3DRotationY(face.normal, new float[]{0, 0, 0}, rotationIncrement); // Rotation applied, no translation
+      face.normal = apply3DRotationX(face.normal, new float[]{0, 0, 0}, rotationIncrement/2);
     }
 
     // Second pass: update the faces with the transformed points

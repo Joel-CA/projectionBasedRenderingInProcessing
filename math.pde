@@ -34,7 +34,19 @@ static float[] vectConstMul(float[] v, float c) {
   return new float[] {v[0]*c, v[1]*c, v[2]*c};
 }
 
-static float[] vect3DotProd(float[] v1, float[] v2) {
+static float dotProd(float[] v1, float[] v2) {
+  float prod = 0;
+  if (v1.length != v2.length){
+    println("Error: dot product must take in equal length vectors");
+    throw null;
+  }
+  for (int i = 0; i < v1.length; i++){
+    prod += v1[i]*v2[i];
+  }
+  return prod;
+}
+
+static float[] vect3CrossProd(float[] v1, float[] v2) {
   return new float[] {v1[1]*v2[2] - v2[1]*v1[2], -(v1[0]*v2[2] - v2[0]*v1[2]), v1[0]*v2[1] - v2[0]*v1[1]};
 }
 
@@ -48,7 +60,21 @@ static float[] calculateNorm(float[][] pointsInPlane) {
   float[] vector1 = apply3DTranslation(point2, neg_point1);
   float[] vector2 = apply3DTranslation(point3, neg_point1);
   
-  return vect3DotProd(vector1, vector2);
+  return vect3CrossProd(vector1, vector2);
+}
+
+//Function to determine if point is in front or behind a given plane
+Boolean isInFrontOfPlane(float[] point, MeshBuilder.Plane plane){
+  return dotProd(point, plane.normal) + plane.D >= 0;
+}
+
+//Function to determine the point of intersection between a given line (defined by 2 points) and plane
+float[] planeIntersectPoint(float[] p1, float[] p2, MeshBuilder.Plane plane) {
+  float[] lineVector = apply3DTranslation(p2, vectConstMul(p1, -1));
+  float numerator = plane.D - dotProd(plane.normal, p1);
+  float denominator = dotProd(plane.normal, lineVector);
+  float t = numerator/denominator;
+  return apply3DTranslation(p1, vectConstMul(lineVector, t));
 }
 
 float[] apply3DRotationX(float[] v, float[] centroid, float degrees) {

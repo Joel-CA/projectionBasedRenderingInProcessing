@@ -34,14 +34,17 @@ public static class MeshBuilder {
   public static class Face {
     public List<float[]> points;
     public float[] normal;
+    //public float[] fragmentToViewer;
     
     public Face(List<float[]> points, float[] normal) {
       this.points = points;
-      this.normal = normal;
+      //this.fragmentToViewer = points.get(0);
+      this.normal = vect3normalize(normal);
     }
     public Face(List<float[]> points) {
       this.points = points;
-      this.normal = calculateNorm(points);
+      //this.fragmentToViewer = points.get(0);
+      this.normal = vect3normalize(calculateNorm(points));
     }
   }
   

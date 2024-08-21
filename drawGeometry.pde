@@ -5,7 +5,7 @@ void drawGeometry(MeshBuilder.Face[] faces) {
   Set<String> linesDrawn = new HashSet<>();
 
   for (MeshBuilder.Face face : faces) {
-    if (face.normal[2] <= 0) { // Only draw faces facing the viewer
+    if (dotProd(vectConstMul(getOrDefault(face.points, 0, new float[] {0, 0, 0}), -1), face.normal) > 0){//(face.normal[2] <= 0) { // Only draw faces facing the viewer
       //Start with the original face
       //List<float[]> vertices = new ArrayList<>(Arrays.asList(face.points));
 

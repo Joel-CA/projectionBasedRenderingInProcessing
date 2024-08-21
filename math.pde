@@ -50,6 +50,21 @@ static float[] vect3CrossProd(float[] v1, float[] v2) {
   return new float[] {v1[1]*v2[2] - v2[1]*v1[2], -(v1[0]*v2[2] - v2[0]*v1[2]), v1[0]*v2[1] - v2[0]*v1[1]};
 }
 
+/*Function to normalize a vector*/
+static float[] vect3normalize(float[] v) {
+  float size = magnitude(v);
+  return new float[] {v[0]/size, v[1]/size, v[2]/size};
+}
+
+/*Function to calculate vector magnitude*/
+static float magnitude(float[] v) {
+  float squared_sum = 0;
+  for (int i = 0; i < v.length; i++){
+    squared_sum += v[i]*v[i];
+  }
+  return (float) Math.pow(squared_sum, 1/2);
+}
+
 /*Function to calculate the normal vector of a plane*/
 static float[] calculateNorm(List<float[]> pointsInPlane) {
   float[] point1 = pointsInPlane.get(0);

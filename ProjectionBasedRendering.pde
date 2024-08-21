@@ -1,9 +1,19 @@
+/*Benchmarking variables*/
 boolean frustumCulling = true;
 boolean backfaceCulling = true;
+// ---
+int framesToTest = 300; // Number of frames to average
+int frameCounter = 0;
+float totalFrameRate = 0;
+boolean benchmarking = false;
 
+/*Constants*/
 final float FOV_DEG = 45; //Field of view (degrees)
 final float FOV_RAD = radians(FOV_DEG); //Field of view (radians)
 final float MOVEMENT_SPEED = 0.5;
+final float frustumOffset = 1;
+final float Z_NEAR = 1/tan(radians(FOV_DEG/2)) * frustumOffset;
+final float Z_FAR = 110;
 boolean CAN_MOVE = false;
 float objectRotationAngle = 0; //Current rotation angle
 float objectRotationSpeed = 20; //Rotation speed (degrees/second)
@@ -14,9 +24,6 @@ MeshBuilder.Plane frontPlane, backPlane, topPlane, bottomPlane, leftPlane, right
 MeshBuilder.Plane[] FRUSTUM;
 
 /*axis-aligned unit vectors*/
-float frustumOffset = 1;
-float Z_NEAR = 1/tan(radians(FOV_DEG/2)) * frustumOffset;
-float Z_FAR = 125;
 float[] Z_MINUS = new float[] {0, 0, -1};
 float[] Z_PLUS = new float[] {0, 0, 1};
 float[] Y_MINUS = new float[] {0, -1, 0};
@@ -61,59 +68,37 @@ void setup() {
     e.printStackTrace();
     println("failed to load STL.");
   }
-  println("STL loaded succesfully!");
+  println("3D model(s) loaded succesfully!");
 
   //move meshes to start position/orientations/scale
   MeshBuilder.applyTransformations(jet, new float[] {0, -30, 100}, 90, 0, 0); //jet
 
   //fishes
   MeshBuilder.applyTransformations(fish1, new float[] {12, 0, 100}, 0, 0, 180);
-  
+
   MeshBuilder.applyTransformations(fish2, new float[] {-2, 0, 15}, 0, 0, 180);
   MeshBuilder.applyScaling(fish2, 5, 5, 5);
-  
+
   MeshBuilder.applyTransformations(fish3, new float[] {0, 10, 100}, 0, 0, 180);
 
   //initialize list of meshes to be rendered
-  meshes = new MeshBuilder.Mesh[] {fish1, fish2, fish3, cube}; //cubePoints
+  meshes = new MeshBuilder.Mesh[] {jet};//{fish1, fish2, fish3, cube}; //cubePoints
 }
 
 void draw() {
   background(#D3D3D3);//reset canvas to prepare for upcoming frame
   text("FPS: " + nf(frameRate, 0, 2), width - 10, height - 10);//display FPS text overlay
 
-  //float[] transformationVec = new float[] {0, 0, 0};
-  ////float[] transformedPoint;// = apply3DRotationY(point, mesh.centroid, rotationIncrement);//point;
-  ////transformedPoint = apply3DRotationX(transformedPoint, mesh.centroid, rotationIncrement/2);
-  //if (key == CODED && CAN_MOVE) {
-  //  if (keyCode == UP) {
-  //    transformationVec = apply3DTranslation(transformationVec, vectConstMul(Z_MINUS, MOVEMENT_SPEED));
-  //  }
-  //  if (keyCode == DOWN) {
-  //    transformationVec = apply3DTranslation(transformationVec, vectConstMul(Z_PLUS, MOVEMENT_SPEED));
-  //  }
-  //  if (keyCode == RIGHT) {
-  //    transformationVec = apply3DTranslation(transformationVec, vectConstMul(X_MINUS, MOVEMENT_SPEED));
-  //  }
-  //  if (keyCode == LEFT) {
-  //    transformationVec = apply3DTranslation(transformationVec, vectConstMul(X_PLUS, MOVEMENT_SPEED));
-  //  }
-  //  if (keyCode == SHIFT) {
-  //    transformationVec = apply3DTranslation(transformationVec, vectConstMul(Y_MINUS, MOVEMENT_SPEED));
-  //  }
-  //  if (keyCode == CONTROL) { // spacebar?
-  //    transformationVec = apply3DTranslation(transformationVec, vectConstMul(Y_PLUS, MOVEMENT_SPEED));
-  //  }
-  //}
+  if (benchmarking) {
+    totalFrameRate += frameRate;
+    frameCounter++;
 
-  //for (MeshBuilder.Mesh mesh: meshes) {
-  //   MeshBuilder.applyTransformations(mesh, transformationVec, 0, 0, 0);
-  //}
-
-  //for (MeshBuilder.Mesh mesh: meshes) {
-  //   drawGeometry(mesh.faces);
-  //}
-
+    if (frameCounter == framesToTest) {
+      float avgFrameRate = totalFrameRate / framesToTest;
+      println("Average Frame Rate: " + avgFrameRate);
+      noLoop(); // Stop the sketch after benchmarking
+    }
+  }
 
   //TODO: Wrap all "drawing" in a conditional that checks the object/points are contained within the viewing fustrum (along all axis) and not obstructed by other objects (z-buffer?)
   //idea: check if display-space pixel location is already being occupied by something with greater z-value (perhaps within threshold of distance?) before drawing, if so dont drawline
@@ -131,7 +116,7 @@ void draw() {
         if (!uniquePoints.containsKey(pointKey)) {
           //float[] transoformationVec = new float[] {0, 0, 0};
           float[] transformedPoint = apply3DRotationY(point, mesh.centroid, rotationIncrement);//point;
-          transformedPoint = apply3DRotationX(transformedPoint, mesh.centroid, rotationIncrement/2);
+          //transformedPoint = apply3DRotationX(transformedPoint, mesh.centroid, rotationIncrement/2);
           if (key == CODED && CAN_MOVE) {
             if (keyCode == UP) {
               transformedPoint = apply3DTranslation(transformedPoint, vectConstMul(Z_MINUS, MOVEMENT_SPEED));
@@ -156,7 +141,7 @@ void draw() {
         }
       }
       face.normal = apply3DRotationY(face.normal, new float[]{0, 0, 0}, rotationIncrement); // Rotation applied, no translation
-      face.normal = apply3DRotationX(face.normal, new float[]{0, 0, 0}, rotationIncrement/2);
+      //face.normal = apply3DRotationX(face.normal, new float[]{0, 0, 0}, rotationIncrement/2);
     }
 
     //Second pass: update the faces with the transformed points
@@ -179,6 +164,21 @@ void draw() {
 
 void keyPressed() {
   CAN_MOVE = true;
+  if (!benchmarking) {
+    if (key == 'f') {
+      benchmarking = true;
+      frustumCulling = !frustumCulling;
+    } else if (key == 'b') {
+      benchmarking = true;
+      backfaceCulling = !backfaceCulling;
+    }else if (key == 'o') {
+      benchmarking = true;
+    }else if (key == 'u') {
+      benchmarking = true;
+      frustumCulling = !frustumCulling;
+      backfaceCulling = !backfaceCulling;
+    }
+  }
 }
 
 void keyReleased() {

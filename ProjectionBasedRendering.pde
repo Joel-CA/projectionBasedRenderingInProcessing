@@ -66,7 +66,7 @@ void setup() {
   jet.centroid = apply3DTranslation(jet.centroid, jetTranslation);
 
   //initialize list of meshes to be rendered
-  meshes = new MeshBuilder.Mesh[] {cube}; //cubePoints
+  meshes = new MeshBuilder.Mesh[] {jet}; //cubePoints
 }
 
 void draw() {

@@ -1,11 +1,11 @@
 //color[] colors = {color(10, 10, 10), color(255, 21, 21), color(21, 255, 21), color(21, 21, 255)};
-
+final float[] zeroVec = new float[] {0, 0, 0};
 void drawGeometry(MeshBuilder.Face[] faces) {
   // Set to store the drawn lines
   Set<String> linesDrawn = new HashSet<>();
 
   for (MeshBuilder.Face face : faces) {
-    if (dotProd(vectConstMul(getOrDefault(face.points, 0, new float[] {0, 0, 0}), -1), face.normal) > 0){//(face.normal[2] <= 0) { // Only draw faces facing the viewer
+    if (dotProd(getOrDefault(face.points, 0, zeroVec), face.normal) < 0){//(face.normal[2] <= 0) { // Only draw faces facing the viewer
       //Start with the original face
       //List<float[]> vertices = new ArrayList<>(Arrays.asList(face.points));
 

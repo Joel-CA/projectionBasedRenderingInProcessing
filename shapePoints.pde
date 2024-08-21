@@ -1,4 +1,4 @@
-/*Cube data*/
+/***Cube data***/
 float[][] cubePoints = {
   {-1, -1, 40}, // 0
   {-1, 1, 40}, // 1
@@ -7,7 +7,7 @@ float[][] cubePoints = {
   {-1, -1, 42}, // 4
   {-1, 1, 42}, // 5
   {1, 1, 42}, // 6
-  {1, -1, 42}    // 7
+  {1, -1, 42} // 7
 };
 
 // Define faces using counterclockwise order when viewed from the outside
@@ -19,15 +19,7 @@ int[][] cubeFaces = {
   {0, 4, 5, 1}, // Left face
   {3, 2, 6, 7}  // Right face
 };
-
-/*Custom getOrDefault function for List objects*/
-public static <T> T getOrDefault(List<T> list, int index, T defaultValue) {
-  if (index >= 0 && index < list.size()) {
-    return list.get(index);
-  } else {
-    return defaultValue;
-  }
-}
+/***END cube data***/
 
 /*Depricated mesh data
  //(0, 0, 0) is top left (behind the camera)

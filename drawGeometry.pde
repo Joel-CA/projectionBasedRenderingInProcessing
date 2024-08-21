@@ -5,13 +5,18 @@ void drawGeometry(MeshBuilder.Face[] faces) {
   Set<String> linesDrawn = new HashSet<>();
 
   for (MeshBuilder.Face face : faces) {
-    if (dotProd(getOrDefault(face.points, 0, zeroVec), face.normal) < 0){//(face.normal[2] <= 0) { // Only draw faces facing the viewer
+    if (!backfaceCulling || dotProd(getOrDefault(face.points, 0, zeroVec), face.normal) < 0) {//(face.normal[2] <= 0) { // Only draw faces facing the viewer
       //Start with the original face
       //List<float[]> vertices = new ArrayList<>(Arrays.asList(face.points));
 
-      List<float[]> vertices = frustumClipPolygon(face.points);//new ArrayList<>(Arrays.asList(face.points));
+      List<float[]> vertices;
+      if (frustumCulling) {
+        vertices = frustumClipPolygon(face.points);
+      } else {
+        vertices = face.points;
+      }
       //if (vertices.size() > 0) {
-      //  println("Number of vertices: " + vertices.size() + " ---------");
+      //println("Number of vertices: " + vertices.size() + " ---------");
       //}
 
       for (int i = 0; i < vertices.size(); i++) {
@@ -44,7 +49,7 @@ void drawGeometry(MeshBuilder.Face[] faces) {
 //Function to clip polygon against the viewing frustum
 List<float[]> frustumClipPolygon(List<float[]> polygonPoints) {
   //Clip the face against each plane in the frustum
-  List<float[]> outputList = polygonPoints;
+  List<float[]> outputList = new ArrayList<>(polygonPoints);
   for (MeshBuilder.Plane frustrumPlane : FRUSTUM) {
     List<float[]> inputList = new ArrayList<>(outputList);
     outputList.clear();
@@ -56,7 +61,7 @@ List<float[]> frustumClipPolygon(List<float[]> polygonPoints) {
 
       boolean currentInside = isInFrontOfPlane(currentVertex, frustrumPlane);
       boolean previousInside = isInFrontOfPlane(previousVertex, frustrumPlane);
-      
+
       //println("Current Vertex: " + Arrays.toString(currentVertex));
       //println("Previous Vertex: " + Arrays.toString(previousVertex));
       //println("Current Inside: " + currentInside);
@@ -102,72 +107,11 @@ int comparePoints(float[] P1, float[] P2) {
   return 0;
 }
 
-/*Depricated*/
-//void drawCube(float[] P1, float[] P2, float[] P3, float[] P4,
-//  float[] P5, float[] P6, float[] P7, float[] P8) {
-//  float[] p1 = proj2DTo3D(P1);
-//  float[] p2 = proj2DTo3D(P2);
-//  float[] p3 = proj2DTo3D(P3);
-//  float[] p4 = proj2DTo3D(P4);
-//  float[] p5 = proj2DTo3D(P5);
-//  float[] p6 = proj2DTo3D(P6);
-//  float[] p7 = proj2DTo3D(P7);
-//  float[] p8 = proj2DTo3D(P8);
-
-//  //line(x1, y1, x2, y2)
-//  stroke(#FF0D0D);
-//  stroke(#229004);
-//  stroke(#0D1AFF);
-//  line(p1[0], p1[1], p2[0], p2[1]);
-//  stroke(#229004);
-//  line(p2[0], p2[1], p3[0], p3[1]);
-//  stroke(#0D1AFF);
-//  line(p3[0], p3[1], p4[0], p4[1]);
-//  stroke(#1F1F1F);
-//  line(p4[0], p4[1], p1[0], p1[1]);
-//  stroke(#FF0D0D);
-//  line(p5[0], p5[1], p6[0], p6[1]);
-//  stroke(#229004);
-//  line(p6[0], p6[1], p7[0], p7[1]);
-//  stroke(#0D1AFF);
-//  line(p7[0], p7[1], p8[0], p8[1]);
-//  stroke(#1F1F1F);
-//  line(p8[0], p8[1], p4[0], p4[1]);
-
-//  stroke(#1F1F1F);
-//  line(p2[0], p2[1], p6[0], p6[1]);
-//  line(p3[0], p3[1], p7[0], p7[1]);
-//  line(p1[0], p1[1], p5[0], p5[1]);
-//  line(p8[0], p8[1], p5[0], p5[1]);
-//}
-
-//void drawSquare(float[] P1, float[] P2, float[] P3, float[] P4) {
-//  float[] p1 = proj2DTo3D(P1);
-//  float[] p2 = proj2DTo3D(P2);
-//  float[] p3 = proj2DTo3D(P3);
-//  float[] p4 = proj2DTo3D(P4);
-
-//  //line(x1, y1, x2, y2)
-//  stroke(#FF0D0D);
-//  line(p1[0], p1[1], p2[0], p2[1]);
-//  stroke(#229004);
-//  line(p2[0], p2[1], p3[0], p3[1]);
-//  stroke(#0D1AFF);
-//  line(p3[0], p3[1], p4[0], p4[1]);
-//  stroke(#1F1F1F);
-//  line(p4[0], p4[1], p1[0], p1[1]);
-//}
-
-//void drawTriangle(float[] P1, float[] P2, float[] P3) {
-//  float[] p1 = proj2DTo3D(P1);
-//  float[] p2 = proj2DTo3D(P2);
-//  float[] p3 = proj2DTo3D(P3);
-
-//  //line(x1, y1, x2, y2)
-//  stroke(#FF0D0D);
-//  line(p1[0], p1[1], p2[0], p2[1]);
-//  stroke(#229004);
-//  line(p2[0], p2[1], p3[0], p3[1]);
-//  stroke(#0D1AFF);
-//  line(p3[0], p3[1], p1[0], p1[1]);
-//}
+/*Custom getOrDefault function for List objects*/
+public static <T> T getOrDefault(List<T> list, int index, T defaultValue) {
+  if (index >= 0 && index < list.size()) {
+    return list.get(index);
+  } else {
+    return defaultValue;
+  }
+}

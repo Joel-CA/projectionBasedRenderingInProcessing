@@ -92,7 +92,7 @@ float[] planeIntersectPoint(float[] p1, float[] p2, MeshBuilder.Plane plane) {
   return apply3DTranslation(p1, vectConstMul(lineVector, t));
 }
 
-float[] apply3DRotationX(float[] v, float[] centroid, float degrees) {
+static float[] apply3DRotationX(float[] v, float[] centroid, float degrees) {
   float theta = radians(degrees);
 
   // Translate the point to the origin based on the centroid
@@ -109,7 +109,7 @@ float[] apply3DRotationX(float[] v, float[] centroid, float degrees) {
   return new float[] {a + centroid[0], b + centroid[1], c + centroid[2]};
 }
 
-float[] apply3DRotationY(float[] v, float[] centroid, float degrees) {
+static float[] apply3DRotationY(float[] v, float[] centroid, float degrees) {
   float theta = radians(degrees);
 
   // Translate the point to the origin based on the centroid
@@ -126,7 +126,7 @@ float[] apply3DRotationY(float[] v, float[] centroid, float degrees) {
   return new float[] {a + centroid[0], b + centroid[1], c + centroid[2]};
 }
 
-float[] apply3DRotationZ(float[] v, float[] centroid, float degrees){
+static float[] apply3DRotationZ(float[] v, float[] centroid, float degrees){
   float theta = radians(degrees);
 
   // Translate the point to the origin based on the centroid

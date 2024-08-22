@@ -1,5 +1,5 @@
 # Projection-Based Rendering In Processing
-Rederiving and implementing projection-based rendering in Processing
+Rederiving and implementing projection-based rendering in Processing.
 
 I have always wondered how in the world we take 3D spatial information and somehow display that in a way that makes sense to us on our flat 2D screens. Curiosity got the best of me one day and I booted up a quick Processing instance because I thought surely this was only a few hours-long task, plus I couldn't be bothered to implement line drawing myself-- I have been here for a week and a half :/. However, It was an enjoyable and informative experience. Without further ado, I present projection-based rendering in Processing, built with nothing more than the built-in *line* function (not using any of the built-in P3D functions here!).
 

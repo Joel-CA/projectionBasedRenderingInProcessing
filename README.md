@@ -25,10 +25,7 @@ This is probably as good as any place to mention that Processing is a processor-
   </div>
   Example of performance difference. Screencapture software had effect on framerate, but benchmarking without screencapture found a 1.283 FPS w/out backface culling (left), and a 3.521 FPS average with backface culling (right).
 
-  
   <li>Frustum Culling/Clipping:</li>
-  Implemented Sutherland-Hodgman Algorithm described in this [wiki page](https://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm#:~:text=The%20Sutherland%E2%80%93Hodgman%20algorithm%20is,are%20on%20the%20visible%20side.).
-  
   <img alt="frustumbackfaced_fishScene.gif" src="demo clips/frustumbackfaced_fishScene.gif" data-hpc="true" class="Box-sc-g0xbh4-0 kzRgrI">
   
   Walking through the scene.
@@ -40,6 +37,7 @@ This is probably as good as any place to mention that Processing is a processor-
   Interestingly, FPS seemed roughly the same with the unclipped scene's FPS dipping only a bit more frequently. Still, once again re-running the benchmark without screen capture impedance, a 17.903 FPS average w/out clipping and a 22.329 FPS average was observed with clipping.
 </ul>
 
+Clipping algorithm [wiki page](https://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm#:~:text=The%20Sutherland%E2%80%93Hodgman%20algorithm%20is,are%20on%20the%20visible%20side).
 
 These optimizations shine through the best when paired and the clipping algorithm need only be performed on faces that are worth considering (i.e. facing the viewer). Here is that last fish scene one more time with both frustum clipping and backface culling enabled:
 <img alt="frustumCulled+backfaceCulled_fishScene.gif" src="demo clips/frustumCulled+backfaceCulled_fishScene.gif" data-hpc="true" class="Box-sc-g0xbh4-0 kzRgrI">

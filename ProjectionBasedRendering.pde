@@ -8,11 +8,11 @@ float totalFrameRate = 0;
 boolean benchmarking = false;
 
 /*Constants*/
-final float FOV_DEG = 45; //Field of view (degrees)
+final float FOV_DEG = 45.0f; //Field of view (degrees)
 final float FOV_RAD = radians(FOV_DEG); //Field of view (radians)
-final float MOVEMENT_SPEED = 0.5;
-final float frustumOffset = 1;
-final float Z_NEAR = 1/tan(radians(FOV_DEG/2)) * frustumOffset;
+final float MOVEMENT_SPEED = 0.5f;
+final float frustumOffset = 1.0f;
+final float Z_NEAR = (1.0f/tan(radians(FOV_DEG/2.0f))) * frustumOffset;
 final float Z_FAR = 110;
 boolean CAN_MOVE = false;
 float objectRotationAngle = 0; //Current rotation angle
@@ -32,12 +32,21 @@ float[] X_MINUS = new float[] {-1, 0, 0};
 float[] X_PLUS = new float[] {1, 0, 0};
 
 /*Mesh objects*/
-MeshBuilder.Mesh jet, fish1, fish2, fish3, cube;
+MeshBuilder.Mesh jet, fish1, fish2, fish3, fish4, fish5, fish6, fish7, cube;
 MeshBuilder.Mesh[] meshes;
 
 void setup() {
   //set display window dimensions
   size(1280, 720);
+  
+  //top = proj2DTo3D(new float[] {0, -0.5f, Z_NEAR});
+  //bottom = proj2DTo3D(new float[] {0, 0.5f, Z_NEAR});
+  //left = proj2DTo3D(new float[] {-0.5f, 0, Z_NEAR});
+  //right = proj2DTo3D(new float[] {0.5f, 0, Z_NEAR});
+  //println(Arrays.toString(top));
+  //println(Arrays.toString(bottom));
+  //println(Arrays.toString(left));
+  //println(Arrays.toString(right));
 
   //set text-overlay color, alignment, and size
   fill(0);
@@ -47,10 +56,10 @@ void setup() {
   //load frustum planes
   frontPlane = new MeshBuilder.Plane(new float[] {0, 0, Z_NEAR}, Z_PLUS);
   backPlane = new MeshBuilder.Plane(new float[] {0, 0, Z_FAR}, Z_MINUS);
-  topPlane = new MeshBuilder.Plane(new float[] {0, -1/2, Z_NEAR}, new float[] {0, -sin(radians(FOV_DEG/2-90)), cos(radians(FOV_DEG/2))});
-  bottomPlane = new MeshBuilder.Plane(new float[] {0, 1/2, Z_NEAR}, new float[] {0, sin(radians(FOV_DEG/2-90)), cos(radians(FOV_DEG/2))});
-  leftPlane = new MeshBuilder.Plane(new float[] {-1/2, 0, Z_NEAR}, new float[] {-sin(radians(FOV_DEG/2-90)), 0, cos(radians(FOV_DEG/2))});
-  rightPlane = new MeshBuilder.Plane(new float[] {1/2, 0, Z_NEAR}, new float[] {sin(radians(FOV_DEG/2-90)), 0, cos(radians(FOV_DEG/2))});
+  topPlane = new MeshBuilder.Plane(new float[] {0, -0.5f, Z_NEAR}, vect3normalize(new float[] {0, Z_NEAR, 0.5f}));
+  bottomPlane = new MeshBuilder.Plane(new float[] {0, 0.5f, Z_NEAR}, vect3normalize(new float[] {0, -Z_NEAR, 0.5f}));
+  leftPlane = new MeshBuilder.Plane(new float[] {-0.5f, 0, Z_NEAR}, vect3normalize(new float[] {Z_NEAR, 0, 0.5f}));
+  rightPlane = new MeshBuilder.Plane(new float[] {0.5f, 0, Z_NEAR}, vect3normalize(new float[] {-Z_NEAR, 0, 0.5f}));
   FRUSTUM = new MeshBuilder.Plane[] {frontPlane, backPlane, topPlane, bottomPlane, leftPlane, rightPlane};
 
   //load shapePoint(s) data
@@ -63,6 +72,10 @@ void setup() {
     fish1 = MeshBuilder.parseOBJ("Goldfish.obj");
     fish2 = MeshBuilder.parseOBJ("fish.obj");//new MeshBuilder.Mesh(fish1);
     fish3 = MeshBuilder.parseOBJ("Mackerelfish.obj");
+    fish4 = new MeshBuilder.Mesh(fish1);
+    fish5 = new MeshBuilder.Mesh(fish2);
+    fish6 = new MeshBuilder.Mesh(fish3);
+    fish7 = new MeshBuilder.Mesh(fish2);
   }
   catch (IOException e) {
     e.printStackTrace();
@@ -71,23 +84,29 @@ void setup() {
   println("3D model(s) loaded succesfully!");
 
   //move meshes to start position/orientations/scale
+  /*jet*/
   MeshBuilder.applyTransformations(jet, new float[] {0, -30, 100}, 90, 0, 0); //jet
 
-  //fishes
+  /*fishes*/
+  //fish 1
   MeshBuilder.applyTransformations(fish1, new float[] {12, 0, 100}, 0, 0, 180);
-
+  //fish2
   MeshBuilder.applyTransformations(fish2, new float[] {-2, 0, 15}, 0, 0, 180);
   MeshBuilder.applyScaling(fish2, 5, 5, 5);
-
+  //fish3
   MeshBuilder.applyTransformations(fish3, new float[] {0, 10, 100}, 0, 0, 180);
 
   //initialize list of meshes to be rendered
-  meshes = new MeshBuilder.Mesh[] {jet};//{fish1, fish2, fish3, cube}; //cubePoints
+  meshes = new MeshBuilder.Mesh[] {fish1, fish2, fish3, fish4, fish5, fish6, fish7, cube}; //{jet};//cubePoints
 }
-
+float[] top, bottom, left, right;
 void draw() {
   background(#D3D3D3);//reset canvas to prepare for upcoming frame
   text("FPS: " + nf(frameRate, 0, 2), width - 10, height - 10);//display FPS text overlay
+  //line(top[0], top[1], right[0], right[1]);
+  //line(right[0], right[1], bottom[0], bottom[1]);
+  //line(bottom[0], bottom[1], left[0], left[1]);
+  //line(left[0], left[1], top[0], top[1]);
 
   if (benchmarking) {
     totalFrameRate += frameRate;
@@ -100,8 +119,6 @@ void draw() {
     }
   }
 
-  //TODO: Wrap all "drawing" in a conditional that checks the object/points are contained within the viewing fustrum (along all axis) and not obstructed by other objects (z-buffer?)
-  //idea: check if display-space pixel location is already being occupied by something with greater z-value (perhaps within threshold of distance?) before drawing, if so dont drawline
   for (MeshBuilder.Mesh mesh : meshes) {
     float rotationIncrement = objectRotationSpeed / frameRate; //make rotation frame-rate independent
     // Map to store unique points and their transformations

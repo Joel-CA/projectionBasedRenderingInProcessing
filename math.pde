@@ -56,13 +56,13 @@ static float[] vect3normalize(float[] v) {
   return new float[] {v[0]/size, v[1]/size, v[2]/size};
 }
 
-/*Function to calculate vector magnitude*/
+/*Function to calculate vector magnitude */
 static float magnitude(float[] v) {
   float squared_sum = 0;
   for (int i = 0; i < v.length; i++){
-    squared_sum += v[i]*v[i];
+    squared_sum += v[i] * v[i];
   }
-  return (float) Math.pow(squared_sum, 1/2);
+  return (float) Math.sqrt(squared_sum);
 }
 
 /*Function to calculate the normal vector of a plane*/
@@ -162,6 +162,6 @@ float[] proj2DTo3D(float[] P) {
   float X = P[0];
   float Y = P[1];
   float Z = P[2];
-  float fovConst = tan(FOV_RAD/2)*Z;
+  float fovConst = tan(radians(FOV_DEG/2))*Z;
   return new float[] {width*X/fovConst + width/2, height*Y/fovConst + height/2};
 }

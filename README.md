@@ -23,10 +23,12 @@ This is probably as good as any place to mention that Processing is a processor-
     <img src="demo clips/unoptimized_jet.gif" alt="unoptimized_jet.gif"  style="width: 400px;">
     <img src="demo clips/frustumCulled+backfaceCulled_jet.gif" alt="frustumCulled+backfaceCulled_jet.gif"  style="width: 400px;">
   </div>
-  Example of performance difference. Screencapture software had effect on framerate, but benchmarking without screencapture found a 1.283 FPS w/out backface culling (left), and a 3.521 FPS average with backface culling (right). 
+  Example of performance difference. Screencapture software had effect on framerate, but benchmarking without screencapture found a 1.283 FPS w/out backface culling (left), and a 3.521 FPS average with backface culling (right).
 
   
   <li>Frustum Culling/Clipping:</li>
+  Implemented Sutherland-Hodgman Algorithm described in this [wiki page](https://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm#:~:text=The%20Sutherland%E2%80%93Hodgman%20algorithm%20is,are%20on%20the%20visible%20side.).
+  
   <img alt="frustumbackfaced_fishScene.gif" src="demo clips/frustumbackfaced_fishScene.gif" data-hpc="true" class="Box-sc-g0xbh4-0 kzRgrI">
   
   Walking through the scene.

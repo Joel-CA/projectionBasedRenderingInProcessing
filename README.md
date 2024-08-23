@@ -31,9 +31,9 @@ This is probably as good as any place to mention that Processing is a processor-
   Example of performance difference. Screencapture software had effect on framerate, but benchmarking without screencapture found a 1.283 FPS w/out backface culling (left), and a 3.521 FPS average with backface culling (right).
 
   <li>Frustum Culling/Clipping:</li>
-  <img alt="demo clips/frustumCulled_cube.gif" src="demo clips/frustumbackfaced_fishScene.gif" data-hpc="true" class="Box-sc-g0xbh4-0 kzRgrI">
+  <img alt="demo clips/frustumCulled_cube.gif" src="demo clips/frustumCulled_cube.gif" data-hpc="true" class="Box-sc-g0xbh4-0 kzRgrI">
   
-  Walking through the scene.
+  Walking through the cube scene. The frustum is tightened to showcase clipping (otherwise, it is lined up with the viewable space and clipping is not easily detectable).
   <div style="display: flex; justify-content: center; gap: 20px;">
     <img src="demo clips/unoptimized_fishScene.gif"  style="width: 400px;">
     <img src="demo clips/frustumCulled_fishScene.gif"  style="width: 400px;">

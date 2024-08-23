@@ -47,7 +47,7 @@ Clipping algorithm [wiki page](https://en.wikipedia.org/wiki/Sutherland%E2%80%93
 These optimizations shine through the best when paired and the clipping algorithm need only be performed on faces that are worth considering (i.e. facing the viewer). Here is that last fish scene one more time with both frustum clipping and backface culling enabled:
 <img alt="frustumCulled+backfaceCulled_fishScene.gif" src="demo clips/frustumCulled+backfaceCulled_fishScene.gif" data-hpc="true" class="Box-sc-g0xbh4-0 kzRgrI">
 
-Upwards of 17 FPS! That's a ~7-frame difference from the screen captured un-fully-optimized fish scene.
+Upwards of 17 FPS! That's a ~7-frame difference from before.
 
 Computer Specs: OS, Windows 11; Processor, Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz; Installed Ram, 1.50 GHz. 32.0 GB (31.6 GB usable). Note that I also had like infinite Chrome tabs open while benchmarking/recording-- may have impacted performance.
 

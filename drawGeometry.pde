@@ -1,5 +1,4 @@
 //color[] colors = {color(10, 10, 10), color(255, 21, 21), color(21, 255, 21), color(21, 21, 255)};
-final float[] zeroVec = new float[] {0, 0, 0};
 void drawGeometry(MeshBuilder.Face[] faces) {
   // Set to store the drawn lines
   Set<String> linesDrawn = new HashSet<>();

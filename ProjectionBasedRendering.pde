@@ -12,12 +12,23 @@ final float FOV_DEG = 45.0f; //Field of view (degrees)
 final float FOV_RAD = radians(FOV_DEG); //Field of view (radians)
 final float MOVEMENT_SPEED = 0.5f;
 final float frustumOffset = 1.0f;
-final float Z_NEAR = (1.0f/tan(radians(FOV_DEG/2.0f))) * frustumOffset;
+final float Z_NEAR = (1.0f/tan(radians(FOV_DEG/2.0f))) * frustumOffset; //distance from view point to camera
 final float Z_FAR = 110;
+final float objectRotationSpeed = 20; //Object rotation speed (degrees/second)
+final float playerRotationSpeed = 1; //Player rotation speed (degrees/second)
+final float[] zeroVec = new float[] {0, 0, 0};
+//final String ROOT_DIRECTORY = "data"; //relative; looks in Processing data folder
+
+/*Game States*/
 boolean CAN_MOVE = false;
-float objectRotationAngle = 0; //Current rotation angle
-float objectRotationSpeed = 20; //Rotation speed (degrees/second)
-final static String ROOT_DIRECTORY = "\\Users\\joelc\\OneDrive\\Documents\\Processing\\Projection_Based_Rendering\\ProjectionBasedRendering\\data\\";
+boolean W_Pressed = false;
+boolean A_Pressed = false;
+boolean S_Pressed = false;
+boolean D_Pressed = false;
+//boolean Q_Pressed = false;
+//boolean E_Pressed = false;
+float playerOrientation = 0; //Player orientation (degrees)
+
 
 /*Plane objects*/
 MeshBuilder.Plane frontPlane, backPlane, topPlane, bottomPlane, leftPlane, rightPlane;
@@ -32,21 +43,12 @@ float[] X_MINUS = new float[] {-1, 0, 0};
 float[] X_PLUS = new float[] {1, 0, 0};
 
 /*Mesh objects*/
-MeshBuilder.Mesh jet, fish1, fish2, fish3, fish4, fish5, fish6, fish7, cube;
-MeshBuilder.Mesh[] meshes;
+MeshBuilder.Mesh jet, fish1, fish2, fish3, fish4, fish5, fish6, fish7, cube1, cube2;
+MeshBuilder.Mesh[] activeScene, fishScene, jetScene, cubeScene;
 
 void setup() {
   //set display window dimensions
   size(1280, 720);
-  
-  //top = proj2DTo3D(new float[] {0, -0.5f, Z_NEAR});
-  //bottom = proj2DTo3D(new float[] {0, 0.5f, Z_NEAR});
-  //left = proj2DTo3D(new float[] {-0.5f, 0, Z_NEAR});
-  //right = proj2DTo3D(new float[] {0.5f, 0, Z_NEAR});
-  //println(Arrays.toString(top));
-  //println(Arrays.toString(bottom));
-  //println(Arrays.toString(left));
-  //println(Arrays.toString(right));
 
   //set text-overlay color, alignment, and size
   fill(0);
@@ -63,15 +65,16 @@ void setup() {
   FRUSTUM = new MeshBuilder.Plane[] {frontPlane, backPlane, topPlane, bottomPlane, leftPlane, rightPlane};
 
   //load shapePoint(s) data
-  cube = new MeshBuilder.Mesh(cubePoints, cubeFaces);
+  cube1 = new MeshBuilder.Mesh(cubePoints, cubeFaces);
+  cube2 = new MeshBuilder.Mesh(cube1);
 
   //load in 3D model data
   try {
     println("reading STL/OBJs...");
-    jet = MeshBuilder.parseSTL("jet.stl");
-    fish1 = MeshBuilder.parseOBJ("Goldfish.obj");
-    fish2 = MeshBuilder.parseOBJ("fish.obj");//new MeshBuilder.Mesh(fish1);
-    fish3 = MeshBuilder.parseOBJ("Mackerelfish.obj");
+    jet = MeshBuilder.parseSTL(sketchPath("data/jet.stl"));
+    fish1 = MeshBuilder.parseOBJ(sketchPath("data/Goldfish.obj"));
+    fish2 = MeshBuilder.parseOBJ(sketchPath("data/fish.obj"));
+    fish3 = MeshBuilder.parseOBJ(sketchPath("data/Mackerelfish.obj"));
     fish4 = new MeshBuilder.Mesh(fish1);
     fish5 = new MeshBuilder.Mesh(fish2);
     fish6 = new MeshBuilder.Mesh(fish3);
@@ -95,32 +98,53 @@ void setup() {
   MeshBuilder.applyScaling(fish2, 5, 5, 5);
   //fish3
   MeshBuilder.applyTransformations(fish3, new float[] {0, 10, 100}, 0, 0, 180);
+  //fish4
+  MeshBuilder.applyTransformations(fish4, new float[] {0, -30, 8}, 0, 0, 180);
+  //fish5
+  MeshBuilder.applyTransformations(fish5, new float[] {50, -50, 8}, 0, 0, 180);
+  //fish6
+  MeshBuilder.applyTransformations(fish6, new float[] {-50, 50, 8}, 0, 0, 180);
+  //fish7
+  MeshBuilder.applyTransformations(fish7, new float[] {20, 50, 8}, 0, 0, 180);
 
-  //initialize list of meshes to be rendered
-  meshes = new MeshBuilder.Mesh[] {fish1, fish2, fish3, fish4, fish5, fish6, fish7, cube}; //{jet};//cubePoints
+  //initialize scences, lists of meshes, to be rendered
+  fishScene = new MeshBuilder.Mesh[] {fish1, fish2, fish3, fish4, fish5, fish6, fish7, cube1};
+  jetScene = new MeshBuilder.Mesh[] {jet};
+  cubeScene = new MeshBuilder.Mesh[] {cube2};
+  
+  activeScene = cubeScene;
 }
 float[] top, bottom, left, right;
 void draw() {
   background(#D3D3D3);//reset canvas to prepare for upcoming frame
   text("FPS: " + nf(frameRate, 0, 2), width - 10, height - 10);//display FPS text overlay
-  //line(top[0], top[1], right[0], right[1]);
-  //line(right[0], right[1], bottom[0], bottom[1]);
-  //line(bottom[0], bottom[1], left[0], left[1]);
-  //line(left[0], left[1], top[0], top[1]);
-
-  if (benchmarking) {
-    totalFrameRate += frameRate;
-    frameCounter++;
-
-    if (frameCounter == framesToTest) {
-      float avgFrameRate = totalFrameRate / framesToTest;
-      println("Average Frame Rate: " + avgFrameRate);
-      noLoop(); // Stop the sketch after benchmarking
-    }
+  if (frustumCulling) {
+    text("Frustum Clipping: ON", width - 10, 30);
+  } else {
+    text("Frustum Clipping: OFF", width - 10, 30);
+  }
+  if (backfaceCulling) {
+    text("Backface Clipping: ON", width - 10, 60);
+  } else {
+    text("Backface Clipping: OFF", width - 10, 60);
   }
 
-  for (MeshBuilder.Mesh mesh : meshes) {
+  /*Benchmarking Disabled for itch.IO upload
+   if (benchmarking) {
+   totalFrameRate += frameRate;
+   frameCounter++;
+   
+   if (frameCounter == framesToTest) {
+   float avgFrameRate = totalFrameRate / framesToTest;
+   println("Average Frame Rate: " + avgFrameRate);
+   noLoop(); // Stop the sketch after benchmarking
+   }
+   }
+   */
+
+  for (MeshBuilder.Mesh mesh : activeScene) {
     float rotationIncrement = objectRotationSpeed / frameRate; //make rotation frame-rate independent
+    playerOrientation = 0;
     // Map to store unique points and their transformations
     Map<String, float[]> uniquePoints = new HashMap<>();
     // First pass: collect unique points
@@ -134,31 +158,43 @@ void draw() {
           //float[] transoformationVec = new float[] {0, 0, 0};
           float[] transformedPoint = apply3DRotationY(point, mesh.centroid, rotationIncrement);//point;
           //transformedPoint = apply3DRotationX(transformedPoint, mesh.centroid, rotationIncrement/2);
-          if (key == CODED && CAN_MOVE) {
-            if (keyCode == UP) {
+          if (CAN_MOVE) {
+            if (keyCode == UP || W_Pressed) { //view forward
               transformedPoint = apply3DTranslation(transformedPoint, vectConstMul(Z_MINUS, MOVEMENT_SPEED));
             }
-            if (keyCode == DOWN) {
+            if (keyCode == DOWN || S_Pressed) { //view back
               transformedPoint = apply3DTranslation(transformedPoint, vectConstMul(Z_PLUS, MOVEMENT_SPEED));
             }
-            if (keyCode == RIGHT) {
+            if (keyCode == RIGHT || D_Pressed) { //view right
               transformedPoint = apply3DTranslation(transformedPoint, vectConstMul(X_MINUS, MOVEMENT_SPEED));
             }
-            if (keyCode == LEFT) {
+            if (keyCode == LEFT || A_Pressed) { //view left
               transformedPoint = apply3DTranslation(transformedPoint, vectConstMul(X_PLUS, MOVEMENT_SPEED));
             }
-            if (keyCode == CONTROL) {
+            if (keyCode == CONTROL) { //view down
               transformedPoint = apply3DTranslation(transformedPoint, vectConstMul(Y_MINUS, MOVEMENT_SPEED));
             }
-            if (keyCode == SHIFT) { // spacebar?
+            if (keyCode == SHIFT) { // view up
               transformedPoint = apply3DTranslation(transformedPoint, vectConstMul(Y_PLUS, MOVEMENT_SPEED));
             }
+            //if (Q_Pressed) { //view rotate left
+            //  transformedPoint = apply3DRotationY(transformedPoint, zeroVec, playerRotationSpeed);
+            //  playerOrientation -= 1;
+            //}
+            //if (E_Pressed) { //view rotate right
+            //  transformedPoint = apply3DRotationY(transformedPoint, zeroVec, -playerRotationSpeed);
+            //  playerOrientation += 1;
+            //}
           }
           uniquePoints.put(pointKey, transformedPoint);
         }
       }
-      face.normal = apply3DRotationY(face.normal, new float[]{0, 0, 0}, rotationIncrement); // Rotation applied, no translation
+      face.normal = apply3DRotationY(face.normal, zeroVec, rotationIncrement);
       //face.normal = apply3DRotationX(face.normal, new float[]{0, 0, 0}, rotationIncrement/2);
+      // Apply player's view rotation on the entire mesh (or camera)
+      //if (Q_Pressed || E_Pressed) {
+      //  face.normal = apply3DRotationY(face.normal, zeroVec, playerOrientation);
+      //}
     }
 
     //Second pass: update the faces with the transformed points
@@ -181,23 +217,61 @@ void draw() {
 
 void keyPressed() {
   CAN_MOVE = true;
-  if (!benchmarking) {
-    if (key == 'f') {
-      benchmarking = true;
-      frustumCulling = !frustumCulling;
-    } else if (key == 'b') {
-      benchmarking = true;
-      backfaceCulling = !backfaceCulling;
-    }else if (key == 'o') {
-      benchmarking = true;
-    }else if (key == 'u') {
-      benchmarking = true;
-      frustumCulling = !frustumCulling;
-      backfaceCulling = !backfaceCulling;
-    }
+  /*Movement*/
+  //if (!benchmarking) { //disabled for itch.io upload
+  if (key == 'w') {
+    W_Pressed = true;
   }
+  if (key == 'a') {
+    A_Pressed = true;
+  }
+  if (key == 's') {
+    S_Pressed = true;
+  }
+  if (key == 'd') {
+    D_Pressed = true;
+  }
+  //if (key == 'q') {
+  //  Q_Pressed = true;
+  //}
+  //if (key == 'e') {
+  //  E_Pressed = true;
+  //}
+  
+  /*Toggling*/
+  if (key == 'f') { //toggle frustum culling
+    benchmarking = true;
+    frustumCulling = !frustumCulling;
+  } else if (key == 'b') { //toggle backface culling
+    benchmarking = true;
+    backfaceCulling = !backfaceCulling;
+  } else if (key == 'o') { //(does nothing for itch.io upload) begin benchmark (optimized)
+    benchmarking = true;
+  } else if (key == 'o') { //toggle optimizations (used to be the disable optimizations key == 'u' function, but change for itch.io upload)
+    benchmarking = true;
+    frustumCulling = !frustumCulling;
+    backfaceCulling = !backfaceCulling;
+  }
+  
+  /*Scene Toggling*/
+  if (key == '1'){
+    activeScene = cubeScene;
+  }
+  else if (key == '2'){
+    activeScene = fishScene;
+  }
+  else if (key == '3'){
+    activeScene = jetScene;
+  }
+  //}
 }
 
 void keyReleased() {
   CAN_MOVE = false;
+  W_Pressed = false;
+  A_Pressed = false;
+  S_Pressed = false;
+  D_Pressed = false;
+  //Q_Pressed = false;
+  //E_Pressed = false;
 }

@@ -78,7 +78,7 @@ public static class MeshBuilder {
 
   // Method to parse the STL file and return an Mesh object
   public static Mesh parseSTL(String filename) throws IOException {
-    FileInputStream fileInputStream = new FileInputStream(new File(ROOT_DIRECTORY + filename));
+    FileInputStream fileInputStream = new FileInputStream(new File(filename));
     byte[] header = new byte[80]; // 80-byte header
     fileInputStream.read(header); // Read the header
     byte[] countBytes = new byte[4];
@@ -141,7 +141,7 @@ public static class MeshBuilder {
 
   // Method to parse the OBJ file and return a Mesh object
   public static Mesh parseOBJ(String filename) throws IOException {
-    BufferedReader reader = new BufferedReader(new FileReader(ROOT_DIRECTORY + filename));
+    BufferedReader reader = new BufferedReader(new FileReader(filename));
 
     List<float[]> vertices = new ArrayList<>();
     List<Face> faces = new ArrayList<>();

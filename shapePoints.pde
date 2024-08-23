@@ -12,7 +12,7 @@ float[][] cubePoints = {
 
 // Define faces using counterclockwise order when viewed from the outside
 int[][] cubeFaces = {
-  {0, 1, 2, 3}, // Front face (counterclockwise when viewed from outside)
+  {0, 1, 2, 3}, // Front face
   {7, 6, 5, 4}, // Back face
   {0, 3, 7, 4}, // Bottom face
   {1, 5, 6, 2}, // Top face

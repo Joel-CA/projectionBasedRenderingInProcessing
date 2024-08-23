@@ -25,8 +25,8 @@ This is probably as good as any place to mention that Processing is a processor-
   </div>
   Unculled (left) vs backface culled (right) cube render.
   <div style="display: flex; justify-content: center; gap: 20px;">
-    <img src="demo clips/unoptimized_jet.gif" alt="unoptimized_jet.gif"  style="width: 400px;">
-    <img src="demo clips/frustumCulled+backfaceCulled_jet.gif" alt="frustumCulled+backfaceCulled_jet.gif"  style="width: 400px;">
+    <img src="demo clips/unoptimized_jet.gif" alt="unoptimized_jet.gif"  style="width: 300px;">
+    <img src="demo clips/frustumCulled+backfaceCulled_jet.gif" alt="frustumCulled+backfaceCulled_jet.gif"  style="width: 300px;">
   </div>
   Example of performance difference. Screencapture software had effect on framerate, but benchmarking without screencapture found a 1.283 FPS w/out backface culling (left), and a 3.521 FPS average with backface culling (right).
 

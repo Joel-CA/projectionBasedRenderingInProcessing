@@ -25,8 +25,8 @@ This is probably as good as any place to mention that Processing is a processor-
   </div>
   Unculled (left) vs backface culled (right) cube render.
   <div style="display: flex; justify-content: center; gap: 20px;">
-    <img src="demo clips/unoptimized_jet.gif" alt="unoptimized_jet.gif"  style="width: 300px;">
-    <img src="demo clips/frustumCulled+backfaceCulled_jet.gif" alt="frustumCulled+backfaceCulled_jet.gif"  style="width: 300px;">
+    <img src="demo clips/unoptimized_jet.gif" alt="unoptimized_jet.gif"  style="width: 350px;">
+    <img src="demo clips/frustumCulled+backfaceCulled_jet.gif" alt="frustumCulled+backfaceCulled_jet.gif"  style="width: 350px;">
   </div>
   Example of performance difference. Screencapture software had effect on framerate, but benchmarking without screencapture found a 1.283 FPS w/out backface culling (left), and a 3.521 FPS average with backface culling (right).
 
@@ -35,8 +35,8 @@ This is probably as good as any place to mention that Processing is a processor-
   
   Walking through the cube scene. The frustum is tightened to showcase clipping (otherwise, it is lined up with the viewable space and clipping is not easily detectable).
   <div style="display: flex; justify-content: center; gap: 20px;">
-    <img src="demo clips/unoptimized_fishScene.gif"  style="width: 400px;">
-    <img src="demo clips/frustumCulled_fishScene.gif"  style="width: 400px;">
+    <img src="demo clips/unoptimized_fishScene.gif"  style="width: 350px;">
+    <img src="demo clips/frustumCulled_fishScene.gif"  style="width: 350px;">
   </div>
   The showcased scene has 3 fish and a cube immediately in view; however, out of view, there are an additional 4 fish the program is still performing the render calculations for. These unviewable fish will serve to make the performance difference more obvious when frustum culling is implemented and they are not rendered. The results reveal how this scene performs frustum unclipped (left) vs clipped (right).
   Interestingly, FPS seemed roughly the same with the unclipped scene's FPS dipping only a bit more frequently. Still, once again re-running the benchmark without screen capture impedance, a 17.903 FPS average w/out clipping and a 22.329 FPS average was observed with clipping.
